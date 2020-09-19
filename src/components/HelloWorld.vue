@@ -31,11 +31,18 @@
 </template>
 
 <script>
+
 export default {
   name: 'HelloWorld',
+  data() {
+    return {
+      issues: ""
+    };
+  },
   props: {
     msg: String
   }
+
 }
 </script>
 
