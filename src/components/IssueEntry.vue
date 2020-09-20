@@ -29,6 +29,7 @@ export default {
   methods: {
     ...mapActions(["startTracker"]),
     async trackThis(issue) {
+      await this.stopTracker();
       await this.startTracker(issue);
     },
   }
@@ -36,6 +37,10 @@ export default {
 </script>
 
 <style scoped>
+
+  .issue .issueid {
+    min-width: 50px;
+  }
   .issue .media-body {
     display: flex;
     flex-direction: row;
@@ -45,8 +50,9 @@ export default {
     flex-grow: 1;
   }
   .issue .media-body button  {
-    width: 35px;
-    height: 35px;
+    min-width: 35px;
+    min-height: 35px;
+    flex-shrink: 0;
   }
   .issue .media-body button span {
     width: 15px;

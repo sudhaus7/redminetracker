@@ -51,11 +51,19 @@ if (SettingsStore.get('redmine')) {
   }
 }
 SettingsStore.onDidChange('redmine', function(newValue,oldValue) {
+
+  // TODO support for different redmines
+
   if (SettingsStore.get('redmine.host') && SettingsStore.get('redmine.apikey')) {
-    redmine = new Redmine(SettingsStore.get('redmine.host'), {apiKey: SettingsStore.get('redmine.apikey'), mode: 'no-cors'});
+    redmine = connectRedmine(SettingsStore.get('redmine.host'),SettingsStore.get('redmine.apikey'));
   }
+
 });
 
+
+function connectRedmine(host,key) {
+  return new Redmine(host, {apiKey: key, mode: 'no-cors'});
+}
 // let redmine = new Redmine('https://redmine.b-factor.de/',{apiKey:'6ffc187374b006f4ad01c2e03df0f3444b20f940', mode: 'no-cors'})
 
 Vue.config.productionTip = false
@@ -66,7 +74,23 @@ var dump_issue = function(issue) {
     console.log('  ' + item + ': ' + JSON.stringify(issue[item]));
   }
 };
-
+function startTimer(context) {
+  context.state.timerid = setTimeout(() => {
+    context.state.tracker.timeElapsed += 1.0;
+    if (context.state.tracker.timeElapsed % 15 === 0) {
+      context.state.tracker.time_entry.hours += 0.25;
+      redmine.update_time_entry(context.state.tracker.time_entry_id, {time_entry: {hours: context.state.tracker.time_entry.hours}}, function (err, data) {
+        if (err) throw err;
+        console.log('tick', data);
+      });
+    }
+    console.log('tock');
+    startTimer(context);
+  }, 60000);
+}
+function stopTimer(context) {
+  clearTimeout(context.state.timerid);
+}
 
 const store = new Vuex.Store({
   state: {
@@ -76,10 +100,14 @@ const store = new Vuex.Store({
     tracker: {
       issue: null,
       timeElapsed: 0.0,
-    }
+      time_entry: null,
+      time_entry_id: 0,
+    },
+    timerid: null
   },
   mutations: {},
   actions: {
+
 
     startTracker(context,issue) {
       //console.log(context,issue);
@@ -88,14 +116,48 @@ const store = new Vuex.Store({
       }
       context.state.tracker.issue = issue;
       context.state.tracker.timeElapsed = 0.0;
+      let mydate = new Date();
+      let time_entry = {
+        issue_id: issue.id,
+        hours: 0.25,
+        comments: 'tracking',
+        activity_id: 9,
+        spent_on: mydate.getFullYear()+'-'+ ('0' + (mydate.getMonth()+1)).slice(-2) + '-' +('0' + mydate.getDate()).slice(-2)
+      };
+      console.log(time_entry);
+
+
+      redmine.create_time_entry( {'time_entry':time_entry}, function(err,data) {
+        console.log(err,data);
+        context.state.tracker.time_entry_id = data.time_entry.id;
+      });
+      context.state.tracker.time_entry = JSON.parse(JSON.stringify(time_entry));
+      startTimer(context);
+      /*
+var time_entry = {
+  time_entry: {
+    project_id: 7,
+    hours: '3'
+  }
+};
+redmine.create_time_entry(time_entry, function(err, data) {
+  if (err) throw err;
+  console.log(data);
+});
+*/
+
 
     },
     stopTracker(context) {
       //console.log(context,issue);
-      context.state.trackerActive = false;
-      context.state.tracker.issue = null;
-      context.state.tracker.timeElapsed = 0.0;
-
+      if (context.state.trackerActive) {
+        context.state.trackerActive = false;
+        context.state.tracker.issue = null;
+        context.state.tracker.timeElapsed = 0.0;
+        context.state.tracker.time_entry = null;
+        context.state.tracker.time_entry_id = 0;
+        stopTimer(context);
+      }
     },
 
     async getMyIssues(context) {
