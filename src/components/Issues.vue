@@ -24,7 +24,7 @@ name: "Issues",
     }
   },
   computed: {
-    ...mapState(["issues"]),
+    ...mapState(["issues","activeredmine"]),
   },
   mounted() {
     this.fetchTheIssues();
@@ -37,6 +37,9 @@ name: "Issues",
 
   },
   watch: {
+    activeredmine(value) {
+      this.fetchTheIssues();
+    },
     filter(value) {
       value = value.toLowerCase();
       if (value.length > 0) {

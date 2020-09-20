@@ -1,41 +1,61 @@
 <template>
-<div>
+<div class="settings">
+  <div class="toolbar">
+    <div class="toolbar-actions">
+      <button class="btn btn-default" v-on:click="addRedmine()"><span class="icon icon-plus"></span></button>
+    </div>
+  </div>
 
-  <div class="form-group">
-    <label>Hostname</label>
-    <input class="form-control" placeholder="https://redmine.com/" type="text" v-model="host"/>
+
+  <div class="configs">
+    <redmine-config :config="config" :key="index" v-for="(config,index) in redmines"></redmine-config>
   </div>
-  <div class="form-group">
-    <label>ApiKey</label>
-    <input class="form-control" placeholder="XXXXXXXXXXXX" type="text" v-model="apikey"/>
-  </div>
+
 </div>
 </template>
 
 <script>
+import RedmineConfig from "@/components/RedmineConfig";
+import { mapState } from "vuex";
 
 export default {
   name: "Settings",
-  computed: {
-      host: {
-        get() {
-          return this.$store.state.globalSettings.get('redmine.host');
-        },
-        set(value) {
-          this.$store.state.globalSettings.set('redmine.host',value);
-        },
-      },
-      apikey: {
-        get() {
-          return this.$store.state.globalSettings.get('redmine.apikey');
-        },
-        set(value) {
-          this.$store.state.globalSettings.set('redmine.apikey',value);
-        },
-      },
-
-      // ...
+  components: {
+    RedmineConfig
   },
+  data() {
+    return {
+      redmines: [],
+    }
+  },
+  mounted() {
+    this.fetchConfigs();
+  },
+  computed: {
+    ...mapState(["globalSettings"]),
+  },
+  methods: {
+    fetchConfigs() {
+      this.redmines = this.globalSettings.get('redmineconfigs');
+    },
+    saveConfigs() {
+      this.globalSettings.set('redmineconfigs',this.redmines);
+    },
+    delRedmine(index) {
+      this.redmines.splice(index, 1);
+      this.globalSettings.set('redmineconfigs',this.redmines);
+    },
+    addRedmine() {
+      this.redmines.push({
+        name:'',
+        host:'',
+        apikey:'',
+        activity_id: 0,
+        valid: false,
+      });
+      this.globalSettings.set('redmineconfigs',this.redmines);
+    }
+  }
 }
 </script>
 
@@ -44,6 +64,9 @@ export default {
     text-align: left;
   }
   input {
+    width: 100%;
+  }
+  .settings {
     width: 100%;
   }
 </style>

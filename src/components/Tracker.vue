@@ -16,13 +16,18 @@ export default {
   name: "Tracker",
 
   computed: {
-    ...mapState(["trackerActive","tracker"]),
+    ...mapState(["trackerActive","tracker","activeredmine"]),
   },
   methods: {
     ...mapActions(["stopTracker"]),
     async stopThis() {
       await this.stopTracker();
     },
+  },
+  watch: {
+    activeredmine(value) {
+      this.stopThis();
+    }
   }
 }
 </script>

@@ -2,6 +2,7 @@
   <div id="app">
 
     <app-header/>
+    <redmine-tabs/>
     <div class="window-content">
 
       <router-view/>
@@ -11,11 +12,13 @@
 </template>
 <script>
 import AppHeader from "@/components/Header";
+import RedmineTabs from "@/components/RedmineTabs";
 
 export default {
   name: 'App',
   components: {
-    AppHeader
+    AppHeader,
+    RedmineTabs
   },
 }
 </script>
@@ -35,7 +38,7 @@ export default {
 
 #app .window-content {
 
-  max-height: calc(100vh - 35px);
+  max-height: calc(100vh - 70px);
 }
 
 </style>

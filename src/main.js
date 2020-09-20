@@ -45,24 +45,26 @@ Vue.filter('percentage', function(value, decimals) {
 
 let redmine = null;
 const SettingsStore = new ElectronStore();
-if (SettingsStore.get('redmine')) {
-  if (SettingsStore.get('redmine.host') && SettingsStore.get('redmine.apikey')) {
-    redmine = new Redmine(SettingsStore.get('redmine.host'), {apiKey: SettingsStore.get('redmine.apikey'), mode: 'no-cors'});
-  }
+
+if (!SettingsStore.get('redmineconfigs')) {
+  SettingsStore.set('redmineconfigs',[]);
 }
-SettingsStore.onDidChange('redmine', function(newValue,oldValue) {
 
-  // TODO support for different redmines
+if (SettingsStore.get('redmineconfigs').length > 0) {
+  redmine = connectRedmine(SettingsStore.get('redmineconfigs')[0]);
+}
 
-  if (SettingsStore.get('redmine.host') && SettingsStore.get('redmine.apikey')) {
-    redmine = connectRedmine(SettingsStore.get('redmine.host'),SettingsStore.get('redmine.apikey'));
-  }
 
+
+
+SettingsStore.onDidChange('redmineconfigs', function(newValue,oldValue) {
+  redmine = connectRedmine(SettingsStore.get('redmineconfigs')[0]);
 });
 
 
-function connectRedmine(host,key) {
-  return new Redmine(host, {apiKey: key, mode: 'no-cors'});
+function connectRedmine(config) {
+  //console.log(config);
+  return new Redmine(config.host, {apiKey: config.apikey, mode: 'no-cors'});
 }
 // let redmine = new Redmine('https://redmine.b-factor.de/',{apiKey:'6ffc187374b006f4ad01c2e03df0f3444b20f940', mode: 'no-cors'})
 
@@ -103,10 +105,12 @@ const store = new Vuex.Store({
       time_entry: null,
       time_entry_id: 0,
     },
-    timerid: null
+    timerid: null,
+    activeredmine: null,
   },
   mutations: {},
   actions: {
+
 
 
     startTracker(context,issue) {
@@ -121,7 +125,7 @@ const store = new Vuex.Store({
         issue_id: issue.id,
         hours: 0.25,
         comments: 'tracking',
-        activity_id: 9,
+        activity_id: context.state.activeredmine.activity_id,
         spent_on: mydate.getFullYear()+'-'+ ('0' + (mydate.getMonth()+1)).slice(-2) + '-' +('0' + mydate.getDate()).slice(-2)
       };
       console.log(time_entry);
@@ -158,6 +162,12 @@ redmine.create_time_entry(time_entry, function(err, data) {
         context.state.tracker.time_entry_id = 0;
         stopTimer(context);
       }
+    },
+
+    switchRedmine(context,config) {
+      context.state.activeredmine = config;
+      redmine = connectRedmine(config);
+      context.state.issues = [];
     },
 
     async getMyIssues(context) {

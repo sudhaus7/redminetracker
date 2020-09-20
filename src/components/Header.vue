@@ -7,7 +7,6 @@
 
         <tracker/>
       </div>
-
     </div>
 
   </header>
