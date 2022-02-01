@@ -170,6 +170,18 @@ redmine.create_time_entry(time_entry, function(err, data) {
       context.state.issues = [];
     },
 
+    async getSpecificIssue(context,issueid) {
+      if (redmine) {
+        redmine.get_issue_by_id(issueid,{},function(err,data) {
+          if (!err) {
+            let issue = data.issue;
+            issue.time_spent = 0;
+            issue.visible = true;
+            context.state.issues.push(issue);
+          }
+        });
+      }
+    },
     async getMyIssues(context) {
      // console.log(context,redmine);
      // context.state.issues = [];
