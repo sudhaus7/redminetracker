@@ -50,6 +50,7 @@ export default {
         name:'',
         host:'',
         apikey:'',
+        comment:'tracking',
         activity_id: 0,
         valid: false,
       });

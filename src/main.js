@@ -81,9 +81,13 @@ function startTimer(context) {
     context.state.tracker.timeElapsed += 1.0;
     if (context.state.tracker.timeElapsed % 15 === 0) {
       context.state.tracker.time_entry.hours += 0.25;
-      redmine.update_time_entry(context.state.tracker.time_entry_id, {time_entry: {hours: context.state.tracker.time_entry.hours}}, function (err, data) {
+      let payload = {
+        hours: context.state.tracker.time_entry.hours,
+        comments: context.state.tracker.comment
+      };
+      redmine.update_time_entry(context.state.tracker.time_entry_id, {time_entry: payload}, function (err, data) {
         if (err) throw err;
-        console.log('tick', data);
+        console.log('tick', data,payload);
       });
     }
     console.log('tock');
@@ -92,6 +96,32 @@ function startTimer(context) {
 }
 function stopTimer(context) {
   clearTimeout(context.state.timerid);
+}
+
+function stopTracker(context,fnc) {
+  //console.log(context,issue);
+  fnc = fnc || function(){};
+  if (context.state.trackerActive) {
+    let payload = {
+      comments: context.state.tracker.comment
+    };
+    redmine.update_time_entry(context.state.tracker.time_entry_id, {time_entry: payload}, function (err, data) {
+      if (err) throw err;
+      console.log('tick', data,payload);
+      context.state.trackerActive = false;
+      context.state.tracker.issue = null;
+      context.state.tracker.timeElapsed = 0.0;
+      context.state.tracker.time_entry = null;
+      context.state.tracker.time_entry_id = 0;
+      context.state.tracker.comment = context.state.activeredmine.comment;
+
+      stopTimer(context);
+      fnc(context);
+    });
+
+  } else {
+    fnc(context);
+  }
 }
 
 const store = new Vuex.Store({
@@ -104,6 +134,7 @@ const store = new Vuex.Store({
       timeElapsed: 0.0,
       time_entry: null,
       time_entry_id: 0,
+      comment: '',
     },
     timerid: null,
     activeredmine: null,
@@ -120,11 +151,12 @@ const store = new Vuex.Store({
       }
       context.state.tracker.issue = issue;
       context.state.tracker.timeElapsed = 0.0;
+      context.state.tracker.comment = context.state.activeredmine.comment;
       let mydate = new Date();
       let time_entry = {
         issue_id: issue.id,
         hours: 0.25,
-        comments: 'tracking',
+        comments: context.state.tracker.comment,
         activity_id: context.state.activeredmine.activity_id,
         spent_on: mydate.getFullYear()+'-'+ ('0' + (mydate.getMonth()+1)).slice(-2) + '-' +('0' + mydate.getDate()).slice(-2)
       };
@@ -153,21 +185,15 @@ redmine.create_time_entry(time_entry, function(err, data) {
 
     },
     stopTracker(context) {
-      //console.log(context,issue);
-      if (context.state.trackerActive) {
-        context.state.trackerActive = false;
-        context.state.tracker.issue = null;
-        context.state.tracker.timeElapsed = 0.0;
-        context.state.tracker.time_entry = null;
-        context.state.tracker.time_entry_id = 0;
-        stopTimer(context);
-      }
+      stopTracker(context);
     },
 
     switchRedmine(context,config) {
-      context.state.activeredmine = config;
-      redmine = connectRedmine(config);
-      context.state.issues = [];
+      stopTracker(context,function() {
+        context.state.activeredmine = config;
+        redmine = connectRedmine(config);
+        context.state.issues = [];
+      });
     },
 
     async getSpecificIssue(context,issueid) {

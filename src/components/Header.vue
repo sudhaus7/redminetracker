@@ -5,6 +5,9 @@
         <router-link class="btn btn-default" to="/"><span class="icon icon-menu"></span></router-link>
         <router-link class="btn btn-default" to="/settings"><span class="icon icon-tools"></span></router-link>
 
+
+      </div>
+      <div class="btn-group">
         <tracker/>
       </div>
     </div>

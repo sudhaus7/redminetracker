@@ -21,10 +21,15 @@
       <input class="form-control" placeholder="XXXXXXXXXXXX" type="text" v-model="config.apikey"/>
     </div>
     <div class="form-group" v-if="config.valid">
-      <label>Default Aktivity</label>
+      <label>Default Activity</label>
       <select class="form-control" v-model="config.activity_id">
         <option :key="idx" :value="activity.id" v-for="(activity,idx) in activities">{{  activity.name }}</option>
       </select>
+    </div>
+
+    <div class="form-group">
+      <label>Default Tracking comment</label>
+      <input v-model="config.comment" class="form-control" placeholder="tracking..." type="text"/>
     </div>
   </div>
 </template>
