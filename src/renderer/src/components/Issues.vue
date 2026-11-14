@@ -10,8 +10,9 @@
 
 <script>
 
-import IssueEntry from "@/components/IssueEntry";
-import {mapActions, mapState} from "vuex";
+import IssueEntry from "@/components/IssueEntry.vue";
+import {mapActions, mapState} from "pinia";
+import {useMainStore} from "@/stores/main";
 
 export default {
 name: "Issues",
@@ -24,13 +25,13 @@ name: "Issues",
     }
   },
   computed: {
-    ...mapState(["issues","activeredmine"]),
+    ...mapState(useMainStore, ["issues","activeredmine"]),
   },
   mounted() {
     this.fetchTheIssues();
   },
   methods: {
-    ...mapActions(["getMyIssues","getSpecificIssue"]),
+    ...mapActions(useMainStore, ["getMyIssues","getSpecificIssue"]),
     async fetchTheIssues() {
       await this.getMyIssues();
     },

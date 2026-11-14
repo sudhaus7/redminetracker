@@ -11,8 +11,8 @@
   </div>
 </template>
 <script>
-import AppHeader from "@/components/Header";
-import RedmineTabs from "@/components/RedmineTabs";
+import AppHeader from "@/components/Header.vue";
+import RedmineTabs from "@/components/RedmineTabs.vue";
 
 export default {
   name: 'App',

@@ -5,21 +5,22 @@
     <span class="desc">
     <span class="project">({{ issue.project.name }})</span><br/>
     {{ issue.subject }}<br/>
-    <span v-if="issue.due_date">Bis: {{ issue.due_date | dateParse('YYYY-MM-DD') | dateFormat('DD.MM.YYYY') }}</span>
+    <span v-if="issue.due_date">Bis: {{ formatDate(issue.due_date) }}</span>
     <span v-if="issue.estimated_hours"> | Max {{ issue.estimated_hours }}h</span>
     <span v-if="issue.time_spent"> | Ist {{ issue.time_spent }}h</span>
-    <span v-if="issue.estimated_hours"> | Done {{ issue.done_ration | percentage }} </span>
+    <span v-if="issue.estimated_hours"> | Done {{ percentage(issue.done_ration) }} </span>
     </span>
     <button class="btn btn-default" v-on:click="startTracker(issue)"><span class="icon icon-play"></span></button>
 
   </div>
-  <!-- <pre>{{ issue | pretty }}</pre> -->
 </li>
 </template>
 
 <script>
 
-import {mapActions} from "vuex";
+import {mapActions} from "pinia";
+import {useMainStore} from "@/stores/main";
+import {formatDate, percentage} from "@/utils/format";
 
 export default {
   name: "IssueEntry",
@@ -27,7 +28,9 @@ export default {
     issue: Object
   },
   methods: {
-    ...mapActions(["startTracker"]),
+    formatDate,
+    percentage,
+    ...mapActions(useMainStore, ["startTracker", "stopTracker"]),
     async trackThis(issue) {
       await this.stopTracker();
       await this.startTracker(issue);

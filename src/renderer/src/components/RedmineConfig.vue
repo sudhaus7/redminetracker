@@ -35,10 +35,11 @@
 </template>
 
 <script>
+import { plain } from "@/utils/format";
 
-import Redmineapi from 'node-redmine';
 export default {
   name: "RedmineConfig",
+  emits: ['delete', 'save'],
   props: {
     config: Object,
     index: Number,
@@ -47,7 +48,7 @@ export default {
 
   data() {
     return {
-      activities: Array,
+      activities: [],
     }
   },
 
@@ -59,35 +60,26 @@ export default {
 
     loadActivities() {
       if (this.config.valid) {
-        let self = this;
-        let tr = new Redmineapi(this.config.host, {apiKey: this.config.apikey});
-        tr.time_entry_activities(function(err,data) {
-          self.activities = data.time_entry_activities;
-        });
+        window.api.redmine.activities(plain(this.config))
+          .then((data) => { this.activities = data.time_entry_activities; })
+          .catch((err) => console.error(err.message));
       }
     },
 
     delRedmine(index) {
-      this.$parent.delRedmine(index);
+      this.$emit('delete', index);
     },
     saveRedmine() {
-      this.$parent.saveConfigs();
+      this.$emit('save');
     },
     testRedmine() {
 
-      let self = this;
-      try {
-        let tr = new Redmineapi(this.config.host, {apiKey: this.config.apikey});
-        tr.time_entry_activities(function(err,data) {
-          //console.log(err,data,self.config);
-          if (data) {
-            self.activities = data.time_entry_activities;
-            self.config.valid = true;
-          }
-        });
-      } catch {
-        console.log('error');
-      }
+      window.api.redmine.activities(plain(this.config))
+        .then((data) => {
+          this.activities = data.time_entry_activities;
+          this.config.valid = true;
+        })
+        .catch((err) => console.error(err.message));
     }
   }
 }

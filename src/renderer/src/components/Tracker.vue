@@ -11,16 +11,17 @@
 </template>
 
 <script>
-import {mapActions, mapState} from "vuex";
+import {mapActions, mapState} from "pinia";
+import {useMainStore} from "@/stores/main";
 
 export default {
   name: "Tracker",
 
   computed: {
-    ...mapState(["trackerActive","tracker","activeredmine"]),
+    ...mapState(useMainStore, ["trackerActive","tracker","activeredmine"]),
   },
   methods: {
-    ...mapActions(["stopTracker"]),
+    ...mapActions(useMainStore, ["stopTracker"]),
     async stopThis() {
       await this.stopTracker();
     },

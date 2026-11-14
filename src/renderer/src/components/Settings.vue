@@ -8,15 +8,15 @@
 
 
   <div class="configs">
-    <redmine-config :config="config" :key="index" v-for="(config,index) in redmines"></redmine-config>
+    <redmine-config :config="config" :index="index" :key="index" v-for="(config,index) in redmines" @delete="delRedmine" @save="persist"></redmine-config>
   </div>
 
 </div>
 </template>
 
 <script>
-import RedmineConfig from "@/components/RedmineConfig";
-import { mapState } from "vuex";
+import RedmineConfig from "@/components/RedmineConfig.vue";
+import { plain } from "@/utils/format";
 
 export default {
   name: "Settings",
@@ -31,19 +31,16 @@ export default {
   mounted() {
     this.fetchConfigs();
   },
-  computed: {
-    ...mapState(["globalSettings"]),
-  },
   methods: {
-    fetchConfigs() {
-      this.redmines = this.globalSettings.get('redmineconfigs');
+    async fetchConfigs() {
+      this.redmines = (await window.api.settings.get('redmineconfigs')) || [];
     },
-    saveConfigs() {
-      this.globalSettings.set('redmineconfigs',this.redmines);
+    persist() {
+      return window.api.settings.set('redmineconfigs', plain(this.redmines));
     },
     delRedmine(index) {
       this.redmines.splice(index, 1);
-      this.globalSettings.set('redmineconfigs',this.redmines);
+      this.persist();
     },
     addRedmine() {
       this.redmines.push({
@@ -54,7 +51,7 @@ export default {
         activity_id: 0,
         valid: false,
       });
-      this.globalSettings.set('redmineconfigs',this.redmines);
+      this.persist();
     }
   }
 }

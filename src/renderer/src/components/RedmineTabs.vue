@@ -7,33 +7,32 @@
 </template>
 
 <script>
-import {mapActions, mapState} from "vuex";
+import {mapActions, mapState} from "pinia";
+import {useMainStore} from "@/stores/main";
 
 export default {
 name: "RedmineTabs",
   data() {
     return {
-      configs: Array,
+      configs: [],
     }
   },
   computed: {
-    ...mapState(["globalSettings","activeredmine"]),
+    ...mapState(useMainStore, ["activeredmine"]),
   },
   mounted() {
-    this.getConfigs();
-    this.initRedmine();
+    this.getConfigs().then(() => this.initRedmine());
   },
   methods: {
-    ...mapActions(["switchRedmine"]),
+    ...mapActions(useMainStore, ["switchRedmine"]),
 
 
-    getConfigs() {
-      this.configs = this.globalSettings.get('redmineconfigs');
+    async getConfigs() {
+      this.configs = (await window.api.settings.get('redmineconfigs')) || [];
     },
     initRedmine() {
-      if (!this.activeredmine && this.globalSettings.get('redmineconfigs').length > 0) {
-        this.switchRedmine(this.globalSettings.get('redmineconfigs')[0]);
-
+      if (!this.activeredmine && this.configs.length > 0) {
+        this.switchRedmine(this.configs[0]);
       }
     }
   }

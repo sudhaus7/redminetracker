@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import Tracker from "@/components/Tracker";
+import Tracker from "@/components/Tracker.vue";
 
 export default {
 

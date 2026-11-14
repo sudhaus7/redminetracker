@@ -1,60 +1,43 @@
 {
   "name": "redminetracker",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
+  "main": "./out/main/index.js",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "electron:build": "vue-cli-service electron:build",
-    "electron:serve": "vue-cli-service electron:serve",
-    "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps"
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "lint": "eslint .",
+    "package": "electron-vite build && electron-builder"
   },
-  "main": "background.js",
-  "dependencies": {
-    "@vuejs-community/vue-filter-date-format": "^1.6.2",
-    "@vuejs-community/vue-filter-date-parse": "^1.1.5",
-    "core-js": "^3.21.1",
-    "electron-store": "^6.0.0",
-    "node-redmine": "^0.2.1",
-    "vue": "^2.6.0",
-    "vue-router": "^3.5.0",
-    "vuex": "^3.6.0",
-    "pbkdf2": "3.0.4"
-  },
-  "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-service": "^4.5.15",
-    "babel-eslint": "^10.1.0",
-    "electron": "^13.1.4",
-    "electron-devtools-installer": "^3.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^6.2.2",
-    "vue-cli-plugin-electron-builder": "~2.1.1",
-    "vue-template-compiler": "^2.6.11"
-
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
+  "build": {
+    "files": [
+      "out/**/*",
+      "package.json"
     ],
-    "parserOptions": {
-      "parser": "babel-eslint"
-    },
-    "rules": {
-      "no-unused-vars": "off"
+    "directories": {
+      "output": "dist_electron"
     }
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ]
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vitejs/plugin-vue": "^6.0.11",
+    "electron": "^45.3.2",
+    "electron-builder": "^26.18.0",
+    "electron-vite": "^6.0.0",
+    "eslint": "^10.15.0",
+    "eslint-plugin-vue": "^10.12.1",
+    "globals": "^17.14.0",
+    "vite": "^8.3.8"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.23",
+    "electron-store": "^12.0.0",
+    "pinia": "^4.1.0",
+    "vue": "^3.5.45",
+    "vue-router": "^5.5.1"
+  },
+  "type": "module"
 }
