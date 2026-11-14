@@ -1,4 +1,4 @@
-# redminetracker
+# Sudhaus7 Redminetracker
 
 A small desktop time tracker for [Redmine](https://www.redmine.org/). It lists the issues you work on, and with one click it starts tracking time against an issue and writes the time entries to Redmine for you. Built with Electron and Vue 3; runs on macOS, Windows and Linux.
 
