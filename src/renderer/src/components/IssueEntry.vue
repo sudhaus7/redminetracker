@@ -8,7 +8,7 @@
     <span v-if="issue.due_date">Bis: {{ formatDate(issue.due_date) }}</span>
     <span v-if="issue.estimated_hours"> | Max {{ issue.estimated_hours }}h</span>
     <span v-if="issue.time_spent"> | Ist {{ issue.time_spent }}h</span>
-    <span v-if="issue.estimated_hours"> | Done {{ percentage(issue.done_ration) }} </span>
+    <span v-if="issue.estimated_hours"> | Done {{ percentage(issue.done_ratio) }} </span>
     </span>
     <button class="btn btn-default" v-on:click="startTracker(issue)"><span class="icon icon-play"></span></button>
 
