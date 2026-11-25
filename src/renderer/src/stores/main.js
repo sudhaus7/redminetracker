@@ -46,6 +46,7 @@ export const useMainStore = defineStore('main', {
       if (!this.trackerActive) {
         this.trackerActive = true
       }
+      api.tracker.setActive(true)
       this.tracker.issue = issue
       this.tracker.timeElapsed = 0.0
       this.tracker.comment = this.activeredmine.comment
@@ -77,6 +78,7 @@ export const useMainStore = defineStore('main', {
           return
         }
         this.trackerActive = false
+        api.tracker.setActive(false)
         this.tracker.issue = null
         this.tracker.timeElapsed = 0.0
         this.tracker.time_entry = null

@@ -5,6 +5,9 @@ contextBridge.exposeInMainWorld('api', {
     get: (key) => ipcRenderer.invoke('settings:get', key),
     set: (key, value) => ipcRenderer.invoke('settings:set', key, value)
   },
+  tracker: {
+    setActive: (active) => ipcRenderer.invoke('tracker:setActive', !!active)
+  },
   redmine: {
     setActive: (config) => ipcRenderer.invoke('redmine:setActive', config),
     issues: (params) => ipcRenderer.invoke('redmine:issues', params),

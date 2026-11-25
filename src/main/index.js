@@ -7,6 +7,8 @@ const SettingsStore = new Store()
 const ALLOWED_KEYS = ['redmineconfigs']
 
 let win = null
+let quitting = false
+const isMac = process.platform === 'darwin'
 let activeConfig = null
 
 function firstConfig() {
@@ -37,6 +39,11 @@ ipcMain.handle('settings:get', (_e, key) => {
 ipcMain.handle('settings:set', (_e, key, value) => {
   checkKey(key)
   SettingsStore.set(key, value)
+})
+
+// show a Dock badge while time is being tracked (macOS)
+ipcMain.handle('tracker:setActive', (_e, active) => {
+  if (isMac) app.dock.setBadge(active ? '●' : '')
 })
 
 ipcMain.handle('redmine:setActive', (_e, config) => {
@@ -77,7 +84,9 @@ function createWindow() {
       preload: join(import.meta.dirname, '../preload/index.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: true
+      sandbox: true,
+      // keep the tracker timer exact while the window is hidden
+      backgroundThrottling: false
     }
   })
 
@@ -88,6 +97,15 @@ function createWindow() {
     win.loadFile(join(import.meta.dirname, '../renderer/index.html'))
   }
 
+  // on macOS closing the window only hides it so tracking keeps running;
+  // the app quits through Cmd+Q, the app menu or the Dock menu
+  win.on('close', (event) => {
+    if (isMac && !quitting) {
+      event.preventDefault()
+      win.hide()
+    }
+  })
+
   win.on('closed', () => {
     win = null
   })
@@ -96,13 +114,19 @@ function createWindow() {
   win.on('moved', saveBounds)
 }
 
+app.on('before-quit', () => {
+  quitting = true
+})
+
 app.on('window-all-closed', () => {
-  app.quit()
+  if (!isMac) app.quit()
 })
 
 app.on('activate', () => {
   if (win === null) {
     createWindow()
+  } else {
+    win.show()
   }
 })
 
