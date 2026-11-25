@@ -2,6 +2,14 @@
 
 A small desktop time tracker for [Redmine](https://www.redmine.org/). It lists the issues you work on, and with one click it starts tracking time against an issue and writes the time entries to Redmine for you. Built with Electron and Vue 3; runs on macOS, Windows and Linux.
 
+## Screenshots
+
+All data shown is made up.
+
+| Issue list | Tracking an issue | Settings |
+| --- | --- | --- |
+| ![Issue list](docs/screenshots/issues.png) | ![Tracking an issue](docs/screenshots/tracking.png) | ![Settings](docs/screenshots/settings.png) |
+
 ## What it does
 
 - **Issue list** – shows issues that are assigned to you or that you watch, across one or more Redmine instances. Each entry shows the issue number, project, subject, due date (`Bis`), estimated hours (`Max`), hours already booked (`Ist`) and the done ratio (`Done`).
